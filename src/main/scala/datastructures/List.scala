@@ -66,6 +66,32 @@ object List {
   def length[A](as: List[A]): Int =
     foldRight(as, 0)((_ ,acc) => acc + 1)
 
+  //Exercise 3.10
+  def foldLeft[A,B](as: List[A], z: B)(f: (A,B) => B): B = as match {
+    case Nil => z
+    case Cons(x, xs) => foldLeft(xs,f(x, z))(f)
+  }
+
+  //Exercise 3.11a
+  def sumFoldLeft(ns: List[Int]) =
+    foldLeft(ns, 0)(_+_)
+
+  //Exercise 3.11b
+  def productFoldLeft(ns: List[Double]) =
+    foldLeft(ns, 1.0)(_*_)
+
+  //Exercise 3.11c
+  def lengthFoldLeft[A](as: List[A]): Int =
+    foldLeft(as, 0)((_, acc) => acc + 1)
+
+  //Exercise 3.12
+  def reverse[A](xs: List[A]): List[A] =
+    foldLeft(xs, Nil: List[A])((x, acc) => Cons(x, acc))
+
+  //Exercise 3.13
+  def foldRightByFoldLeft[A,B](as: List[A], z: B)(f: (A,B) => B): B =
+    foldLeft(reverse(as), z)(f)
+
   def append[A](a1: List[A], a2: List[A]): List[A] =
     a1 match {
       case Nil => a2
@@ -88,10 +114,8 @@ object ListDriver {
       case Cons(h,t) => h + List.sum(t)
     }
 
-    //Exercise 3.8
+    //Exercise 3.8e
     //Assumption: This should produce the same list
     val xs = List.foldRight(List(1,2,3), Nil:List[Int])(Cons(_,_))
-    println(xs)
-
   }
 }
