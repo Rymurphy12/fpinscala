@@ -92,6 +92,66 @@ object List {
   def foldRightByFoldLeft[A,B](as: List[A], z: B)(f: (A,B) => B): B =
     foldLeft(reverse(as), z)(f)
 
+  //Exercise 3.14
+  def appendFold[A](a1: List[A],a2: List[A]): List[A] =
+    foldRightByFoldLeft(a1, a2)(Cons(_,_))
+
+  //Exercise 3.15
+  def flatten[A](as: List[List[A]]): List[A] = {
+    foldRightByFoldLeft(as, Nil: List[A])(appendFold(_,_))
+  }
+
+  //Exercise 3.16
+  def plusOne(xs: List[Int]): List[Int] =
+    foldRightByFoldLeft(xs, Nil: List[Int])((h,t) => Cons(h +1,t))
+
+  //Exercise 3.17
+  def doubleToString(xs: List[Double]): List[String] =
+    foldRightByFoldLeft(xs, Nil: List[String])((h,t) => Cons(h.toString(), t))
+
+  //Exercise 3.18
+  def map[A,B](as: List[A])(f: A => B): List[B] =
+    foldRightByFoldLeft(as, Nil: List[B])((h,t) => Cons(f(h),t))
+
+  //Exercise 3.19
+  def filter[A](as: List[A])(f: A => Boolean): List[A] =
+    foldRightByFoldLeft(as, Nil: List[A])((h,t) => if(f(h)) Cons(h, t) else t)
+
+  //Exercise 3.20
+  def flatMap[A,B](as: List[A])(f: A  => List[B]): List[B] =
+    flatten(map(as)(h => f(h)))
+
+  //Exercise 3.21
+  def filterByFlatMap[A](as: List[A])(f: A => Boolean): List[A] =
+    flatMap(as)(h => if(f(h)) List(h) else Nil)
+
+  //Exercise 3.22
+  def addLists(a1: List[Int], a2: List[Int]): List[Int] = (a1, a2) match {
+    case (Cons(_,_), Nil) => Nil
+    case (Nil, Cons(_,_)) => Nil
+    case (Cons(h1,t1), Cons(h2, t2)) => Cons(h1 + h2, addLists(t1, t2))
+  }
+
+  //Exercise 3.23
+  def zipWidth[A](a1: List[A], a2: List[A])(f: (A,A) => A): List[A] = (a1,a2) match {
+    case (Cons(_,_), Nil) => Nil
+    case (Nil, Cons(_,_)) => Nil
+    case (Cons(h1,t1), Cons(h2, t2)) => Cons(f(h1,h2), zipWidth(t1,t2)(f))
+  }
+
+  //Exercise 3.24
+  def hasSubsequence[A](sup: List[A], sub: List[A]): Boolean = sup match {
+      case Nil => sub == Nil
+      case _ if matchingSequence(sup, sub) => true
+      case Cons(_, t) => hasSubsequence(t, sub)
+  }
+
+  def matchingSequence[A](sup: List[A], sub: List[A]): Boolean = (sup, sub) match {
+    case (_, Nil) => true
+    case (Cons(h1,t1), Cons(h2, t2)) if h1 == h2 => matchingSequence(t1, t2)
+    case _ => false
+  }
+
   def append[A](a1: List[A], a2: List[A]): List[A] =
     a1 match {
       case Nil => a2
@@ -117,5 +177,6 @@ object ListDriver {
     //Exercise 3.8e
     //Assumption: This should produce the same list
     val xs = List.foldRight(List(1,2,3), Nil:List[Int])(Cons(_,_))
+
   }
 }
