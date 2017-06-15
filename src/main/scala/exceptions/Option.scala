@@ -34,13 +34,27 @@ sealed trait Option[+A]{
   def variance(xs: Seq[Double]): Option[Double] =
     mean(xs) flatMap(m => mean(xs.map(x => Math.pow(x - m, 2 ))))
 
-  //Exercise 4.3
-  def map2[B,C](a: Option[A], b: Option[B])(f: (A,B) => C): Option[C] =
-    a flatMap (x => b map(y => f(x,y)))
 
-  //Exercise 4.4
-  //def sequence(a: List[Option])
 }
 
 case class Some[+A](get: A) extends Option[A]
 case object None extends Option[Nothing]
+
+object Option {
+  //Exercise 4.3
+  def map2[A,B,C](a: Option[A], b: Option[B])(f: (A,B) => C): Option[C] =
+    a flatMap (x => b map(y => f(x,y)))
+
+  //Exercise 4.4
+  def sequence[A](a: List[Option[A]]): Option[List[A]] = a match {
+    case Nil => None
+    case h :: t => h flatMap(x => sequence(t) map(y => x :: y))
+  }
+
+  //Exercise 4.5
+  def traverse[A,B](a: List[A])(f: A => Option[B]): Option[List[B]] =
+    a.foldRight[Option[List[B]]](Some(Nil))((x, acc) => map2(f(x), acc)(_ :: _) )
+
+  def sequenceByTraverse[A](a: List[Option[A]]):Option[List[A]] =
+    traverse(a)(x => x)
+}
