@@ -6,6 +6,19 @@ sealed trait Stream[+A]{
     case Cons(h, t) => Some(h())
   }
 
+  def existsExplicit(p: A => Boolean): Boolean = this match {
+    case Cons(h,t) => p((h())) || t().existsExplicit(p)
+    case _ => false
+  }
+
+  def foldRight[B](z: => B)(f: (A, => B) => B): B = this match {
+    case Cons(h,t) => f(h(), t().foldRight(z)(f))
+    case _ => z
+  }
+
+  def exists(p: A => Boolean): Boolean =
+    foldRight(false)((a,b) => p(a) || b)
+
   //Exercise 5.1
   def toList: List[A] = {
     def go(acc: List[A], s: Stream[A]): List[A] = s match {
@@ -33,7 +46,36 @@ sealed trait Stream[+A]{
     case Cons(h,t) if p(h()) => Stream.cons(h(), t().takeWhile(p))
     case _ => Stream.empty
   }
+
+  //Exercise 5.4
+  def forAll(p: A => Boolean): Boolean =
+    foldRight(true)((h,t) => p(h) && t)
+
+  //Exercise 5.5
+  def takeWhileByFoldRight(p: A => Boolean): Stream[A] =
+    foldRight(Stream.empty[A])((h, t) => if (p(h)) Stream.cons(h, t) else Stream.empty )
+
+  //Exercise 5.6
+  def headOptionByFoldRight: Option[A] =
+    foldRight(None: Option[A])((h,_) => Some(h))
+
+  //Exercise 5.7
+  def map[B](f: A => B): Stream[B] =
+    foldRight(Stream.empty[B])((h,t) => Stream.cons(f(h), t))
+
+  //Exercise 5.7
+  def filter(f: A => Boolean): Stream[A] =
+    foldRight(Stream.empty[A])((h,t) => if(f(h)) Stream.cons(h,t) else t)
+
+  //Exercise 5.7
+  def append(a2: () => Stream[A]): Stream[A] =
+    foldRight(a2(): Stream[A])(Stream.cons(_,_))
+
+  //Exercise 5.7
+  def flatMap[B](f: A => Stream[B]): Stream[B] =
+    foldRight(Stream.empty[B])()
 }
+
 case object Empty extends Stream[Nothing]
 case class Cons[+A](h: () => A, tl: () => Stream[A]) extends Stream[A]
 
