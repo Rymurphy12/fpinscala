@@ -2,7 +2,7 @@ package fpinscala.exceptions
 
 sealed trait Either[+E, +A]{
 
-  def Try(a: => A): Either[Exception, A] =
+  def Try[A](a: => A): Either[Exception, A] =
     try Right(a)
     catch { case e: Exception => Left(e) }
 
@@ -29,13 +29,13 @@ sealed trait Either[+E, +A]{
     flatmap (x => b map(y => f(x,y)))
 
   //Exercise 4.7
-  def sequence(es: List[Either[E,A]]): Either[E, List[A]] = es match {
+  def sequence[E,A](es: List[Either[E,A]]): Either[E, List[A]] = es match {
     case Nil => Right(Nil)
     case h :: t => h flatmap(x => sequence(t) map(y => x :: y))
   }
 
   //Exercise 4.7
-  def traverse[B](as: List[A])(f: A => Either[E,B]): Either[E, List[B]] =
+  def traverse[E,A,B](as: List[A])(f: A => Either[E,B]): Either[E, List[B]] =
     as.foldRight[Either[E,List[B]]](Right(Nil))((x,acc) => f(x).map2(acc)(_::_))
 
 }
