@@ -73,7 +73,7 @@ sealed trait Stream[+A]{
 
   //Exercise 5.7
   def flatMap[B](f: A => Stream[B]): Stream[B] =
-    foldRight(Stream.empty[B])()
+    foldRight(Stream.empty[B])((h,t) => f(h).append(() => t))
 }
 
 case object Empty extends Stream[Nothing]
