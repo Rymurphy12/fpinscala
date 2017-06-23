@@ -75,10 +75,7 @@ sealed trait Stream[+A]{
   def flatMap[B](f: A => Stream[B]): Stream[B] =
     foldRight(Stream.empty[B])((h,t) => f(h).append(t))
 
-  //Exercise 5.8
-  def constant(a: A): Stream[A] = {
-    Stream.cons(a, constant(a))
-  }
+  //Exercise 5.8 is moved to the companion object
 
   //Exercise 5.9
   def from(n: Int): Stream[Int] = {
@@ -111,6 +108,11 @@ object Stream {
   def apply[A](as: A*): Stream[A] =
     if (as.isEmpty) empty else cons(as.head, apply(as.tail: _*))
 
+  //Exercise 5.8
+  def constant[A](a: A): Stream[A] = {
+    Stream.cons(a, constant(a))
+  }
+
   //Exercise 5.11
   def unfold[A,S](z: S)(f: S => Option[(A,S)]): Stream[A] = f(z) match {
     case Some((a,s)) => Stream.cons(a,unfold(s)(f))
@@ -136,5 +138,33 @@ object Stream {
 
   //Exercise 5.13
   def mapUnfold[A,B](as: Stream[A])(f: A => B): Stream[B] =
-    unfold(as){case Cons(h,t) => Some((f(h()), t()))}
+    unfold(as){
+      case Cons(h,t) => Some((f(h()), t()))
+      case _ => None
+    }
+
+  //Exercise 5.13
+  def takeUnfold[A](as: Stream[A])(n:Int): Stream[A] =
+    unfold((as, n)){
+      case (Cons(h,_), 0) => Some((h(),(empty,0)))
+      case (Cons(h,t), n) => Some((h(), (t(), n -1)))
+      case _ => None
+    }
+
+  //Exercise 5.13
+  def takeWhileUnfold[A](as: Stream[A])(p: A => Boolean): Stream[A] =
+    unfold(as){
+      case Cons(h,t) if p(h()) => Some((h(),t()))
+      case _ => None
+    }
+
+  //Exercise 5.13
+  def zipWidth[A](a1: Stream[A], a2: Stream[A])(f:(A,A) => A): Stream[A] =
+    unfold((a1,a2)){
+      case (Cons(h1,t1), Cons(h2,t2)) =>  Some((f(h1(),h2()), (t1(),t2())))
+      case _ => None
+    }
+
+  //Exercise 5.13
+
 }
