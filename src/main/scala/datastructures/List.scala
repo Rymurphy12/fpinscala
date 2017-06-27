@@ -127,15 +127,15 @@ object List {
 
   //Exercise 3.22
   def addLists(a1: List[Int], a2: List[Int]): List[Int] = (a1, a2) match {
-    case (Cons(_,_), Nil) => Nil
-    case (Nil, Cons(_,_)) => Nil
+    case (_, Nil) => Nil
+    case (Nil, _) => Nil
     case (Cons(h1,t1), Cons(h2, t2)) => Cons(h1 + h2, addLists(t1, t2))
   }
 
   //Exercise 3.23
   def zipWidth[A](a1: List[A], a2: List[A])(f: (A,A) => A): List[A] = (a1,a2) match {
-    case (Cons(_,_), Nil) => Nil
-    case (Nil, Cons(_,_)) => Nil
+    case (_ , Nil) => Nil
+    case (Nil, _) => Nil
     case (Cons(h1,t1), Cons(h2, t2)) => Cons(f(h1,h2), zipWidth(t1,t2)(f))
   }
 
