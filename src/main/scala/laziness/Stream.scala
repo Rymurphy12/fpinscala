@@ -105,7 +105,7 @@ sealed trait Stream[+A]{
     unfold(n)(n => Some((n , n + 1)))
 
   //Exercise 5.12
-  def constantUnfold(a: A): Stream[A] =
+  def constantUnfold[B >: A](a: B): Stream[B] =
     unfold(a)(a => Some((a, a)))
 
   //Exercise 5.12
@@ -135,7 +135,7 @@ sealed trait Stream[+A]{
     }
 
   //Exercise 5.13
-  def zipWidth(s2: Stream[A])(f:(A,A) => A): Stream[A] =
+  def zipWidth[B >: A](s2: Stream[B])(f:(B,B) => B): Stream[B] =
     unfold((this, s2)){
       case (Cons(h1,t1), Cons(h2,t2)) =>  Some((f(h1(),h2()), (t1(),t2())))
       case _ => None
@@ -154,7 +154,7 @@ sealed trait Stream[+A]{
   }
 
   //Exercise 5.14
-  def startsWith(s: Stream[A]): Boolean =
+  def startsWith[B >: A](s: Stream[B]): Boolean =
     zipAll(s).takeWhileUnfold(!_._2.isEmpty).forAll {
       case (h,h2) => h == h2
     }
@@ -166,7 +166,7 @@ sealed trait Stream[+A]{
         case s => Some((s,s drop 1))
       } append Stream(Stream.empty)
 
-    def hasSubsequence(s: Stream[A]) : Boolean =
+    def hasSubsequence[B >: A](s: Stream[B]) : Boolean =
       tails exists (_ startsWith s)
 
     //Exercise 5.16
