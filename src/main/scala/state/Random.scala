@@ -1,9 +1,9 @@
 package fpinscala.state
 
 trait RNG {
-
+  def map
   type Rand[+A] = RNG => (A, RNG)
-
+  
   def nextInt: (Int, RNG)
 
   //Exercise 6.1
@@ -32,6 +32,7 @@ trait RNG {
     val ((i,d), rng1) = intDouble(rng)
     ((d, i), rng1)
   }
+  
 
   //Exercise 6.3
   def double3(rng: RNG): ((Double, Double, Double), RNG) = {
