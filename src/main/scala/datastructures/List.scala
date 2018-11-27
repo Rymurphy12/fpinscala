@@ -80,5 +80,84 @@ object List {
     }
     loop(l, Nil)
   }
-    
+
+  def foldRight[A,B](as: List[A], z :B)(f: (A,B) => B): B =
+    as match {
+      case Nil         => z
+      case Cons(x, xs) => f(x, foldRight(xs, z)(f))
+    }
+
+  def sum2(ns: List[Int]) =
+    foldRight(ns, 0)(_+_)
+
+  def product2(ns: List[Double]) =
+    foldRight(ns, 1.0)(_*_)
+
+  /*Exercise 3.7 This is not possiible. Because of foldRight's generic
+    nature we must evaluate every argument on the list until we reach
+    Nil  */
+
+  //Exercise 3.8
+  //Prediction: It will returnthe same list
+  //Result: This is what happens. I think it shows that foldRight
+  //        follows the conventions of the List by moving from left
+  //        to right
+
+  // Exercise 3.9
+  def length[A](as: List[A]): Int =
+    foldRight(as, 0)((_, acc) => acc + 1)
+
+  // Exercise 3.10
+  @annotation.tailrec
+  def foldLeft[A,B](as: List[A], z: B)(f: (B,A) => B): B =
+    as match {
+      case Nil          => z
+      case Cons(x, xs)  => foldLeft(xs, f(z, x))(f)
+    }
+
+  // Exercise 3.11
+  def sum3(ns: List[Int]) =
+    foldLeft(ns, 0)(_ + _)
+
+  def product3(ns: List[Double]) =
+    foldLeft(ns, 1.0)(_ * _)
+
+  def length2[A](as: List[A]): Int =
+    foldLeft(as, 0)((acc, _) => acc + 1)
+
+  //Exercise 3.12
+  def reverse[A](xs: List[A]): List[A] =
+    foldLeft(xs, Nil: List[A])((y, x) => Cons(x, y))
+
+  // Exercise 3.13
+  def foldRight2[A,B](as: List[A], z :B)(f: (A,B) => B): B =
+    foldLeft(reverse(as), z)((y, x) => f(x, y))
+
+  // Exercise 3.14
+  def append2[A](xs: List[A], ys: List[A]): List[A] =
+    foldRight2(xs, ys)(Cons(_, _))
+
+  // Exercise 3.15
+  def concat[A](xxs: List[List[A]]): List[A] =
+    foldRight2(xxs, Nil: List[A])(append(_,_))
+
+  // Exercise 3.16
+  def incrementList(xs: List[Int]): List[Int] =
+    foldRight2(xs, Nil: List[Int])((x, y) => Cons(x +1, y))
+
+  // Exercise 3.17
+  def listDoubleToListString(xs: List[Double]): List[String] =
+    foldRight2(xs, Nil: List[String])((x, y) => Cons(x.toString, y))
+
+  // Exercise 3.18
+  def map[A, B](as: List[A])(f: A => B): List[B] =
+    foldRight2(as, Nil: List[B])((h, t) => Cons(f(h), t))
+
+  // Exercise 3.19
+  def filter[A](as: List[A])(f: A => Boolean): List[A] =
+    foldRight2(as, Nil: List[A])((h, t) => if(f(h)) Cons(h,t) else t)
+
+  // Exercise 3.20
+  def flatMap[A,B](as: List[A])(f: A => List[B]): List[B] =
+    concat(map(as)(f))
 }
