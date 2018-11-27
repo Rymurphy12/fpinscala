@@ -149,7 +149,6 @@ object List {
   def listDoubleToListString(xs: List[Double]): List[String] =
     foldRight2(xs, Nil: List[String])((x, y) => Cons(x.toString, y))
 
-  // Exercise 3.18
   def map[A, B](as: List[A])(f: A => B): List[B] =
     foldRight2(as, Nil: List[B])((h, t) => Cons(f(h), t))
 
@@ -160,4 +159,40 @@ object List {
   // Exercise 3.20
   def flatMap[A,B](as: List[A])(f: A => List[B]): List[B] =
     concat(map(as)(f))
+
+  // Exercise 3.21
+  def filter2[A](as: List[A])(f: A => Boolean): List[A] =
+    flatMap(as)(x => if(f(x)) List(x) else Nil)
+  
+  // Exercise 3.22
+  def addLists(xs: List[Int], ys: List[Int]): List[Int] = (xs, ys) match {
+    case (Nil, _) => Nil
+    case (_, Nil) => Nil
+    case (Cons(h1, t1), Cons(h2, t2)) => Cons(h1 + h2, addLists(t1, t2))
+  }
+
+  //Exercise 3.23
+  def zipWith[A, B, C](xs: List[A], ys: List[B])(f: (A, B) => C): List[C] = (xs, ys) match {
+    case (Nil, _) => Nil
+    case (_, Nil) => Nil
+    case (Cons(h1, t1), Cons(h2, t2)) => Cons(f(h1, h2), zipWith(t1, t2)(f))
+  }
+
+  //Exercise 3.24
+  @annotation.tailrec
+  def startsWith[A](l: List[A], prefix: List[A]): Boolean = (l, prefix) match {
+    case (_, Nil) => true
+    case (Cons(h1,t1), Cons(h2, t2)) if h1 == h2 => startsWith(t1, t2)
+    case _ => false
+  }
+
+  @annotation.tailrec
+  def hasSubsequence[A](sup: List[A], sub: List[A]): Boolean = sup match {
+    case Nil => sub == Nil
+    case _ if startsWith(sup, sub) => true
+    case Cons(_, t) => hasSubsequence(t, sub)
+  }
+  
+
+
 }
